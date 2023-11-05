@@ -61,7 +61,7 @@ class CallBackHandlerView(APIView):
                  
                 data= json.loads(response.text)
 
-                jwt_data={'email':data['email']}
+                jwt_data=data
                 token=jwt.encode(jwt_data,settings.SECRET_KEY,algorithm='HS256')
                 response=HttpResponseRedirect('/register/')
                 response.set_cookie('jwt_token',token)
@@ -71,9 +71,23 @@ class CallBackHandlerView(APIView):
 
 class RegisterView(APIView):
     def get(self,request):
-        global data
+        #check if user is authenticated through google_Oauth
+        token=request.COOKIES.get('jwt_token')
+        if not token:
+            return HttpResponseRedirect('/')
+        try:
+
+            data=jwt.decode(token,settings.SECRET_KEY,algorithms=['HS256'])
+        except:
+            return HttpResponseRedirect('/')
         if LeaderModle.objects.filter(email=data['email']).exists():
-            return Response({'message':'user already exists'})
+            if LeaderModle.objects.get(email=data['email']).is_paid:
+                return HttpResponseRedirect('/dashboard/')
+            elif TeamModle.objects.filter(Leader=LeaderModle.objects.get(email=data['email'])).exists():
+                return HttpResponseRedirect('/dashboard/')
+            else:
+                return render(request,'oauth/register.html',context={'data':data})
+            
         else:
             LeaderModle.objects.create(
                 email=data['email'],
@@ -85,7 +99,14 @@ class RegisterView(APIView):
             
             return render(request,'oauth/register.html',context={'data':data})
     def post(self,request):
-        global data
+        token=request.COOKIES.get('jwt_token')
+        if not token:
+            return HttpResponseRedirect('/')
+        try:
+
+            data=jwt.decode(token,settings.SECRET_KEY,algorithms=['HS256'])
+        except:
+            return HttpResponseRedirect('/')
         team_data=request.data
         TeamModle.objects.create(
             team_name=team_data['team_name'],
@@ -99,7 +120,14 @@ class RegisterView(APIView):
 
 class DashBoardView(APIView):
     def get(self,request):
-        global data
+        token=request.COOKIES.get('jwt_token')
+        if not token:
+            return HttpResponseRedirect('/')
+        try:
+
+            data=jwt.decode(token,settings.SECRET_KEY,algorithms=['HS256'])
+        except:
+            return HttpResponseRedirect('/')
         if LeaderModle.objects.filter(email=data['email']).exists():
             Leader=LeaderModle.objects.get(email=data['email'])
             teams=TeamModle.objects.filter(Leader=Leader)
@@ -175,5 +203,9 @@ class PaymentCallBackView(APIView):
             # if we don't find the required parameters in POST data
             return Response({'message':'payment failed'})
 
-
+class LogoutView(APIView):
+    def get(self,request):
+        response=HttpResponseRedirect('/')
+        response.delete_cookie('jwt_token')
+        return response
 

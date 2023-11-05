@@ -8,4 +8,5 @@ urlpatterns = [
     path('dashboard/',views.DashBoardView.as_view(),name='dashboard'),
     path('payment/',views.PaymentView.as_view(),name='paymanet'),
     path('payment/callback/',views.PaymentCallBackView.as_view(),name='callback_payment'),
+    path('logout/',views.LogoutView.as_view(),name='logout'),
 ]
