@@ -11,7 +11,7 @@ data={'email':''}
 
 class LandingPageView(APIView):
     def get(self,request):
-        return render(request,'oauth/landing_page.htmml')
+        return render(request,'oauth/landing_page.html')
 class GoogleOauthView(APIView):
     def get(self,request):
         auth_url='https://accounts.google.com/o/oauth2/v2/auth'
