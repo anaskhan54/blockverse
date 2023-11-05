@@ -117,6 +117,8 @@ class DashBoardView(APIView):
             data=jwt.decode(token,settings.SECRET_KEY,algorithms=['HS256'])
         else:
             return Response({'message':'user not authenticated'})
+        if LeaderModle.objects.filter(email=data['email']).exists()==False:
+            return HttpResponseRedirect('/register/')
         if TeamModle.objects.filter(Leader=LeaderModle.objects.get(email=data['email'])).exists()==False:
             return HttpResponseRedirect('/register/')
 
