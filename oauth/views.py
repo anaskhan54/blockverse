@@ -16,7 +16,7 @@ class LandingPageView(APIView):
 class GoogleOauthView(APIView):
     def get(self,request):
         auth_url='https://accounts.google.com/o/oauth2/v2/auth'
-        redirect_uri = 'http://gauth-blockverse.com:8000/oauth/'
+        redirect_uri = 'http://ec2-3-109-124-174.ap-south-1.compute.amazonaws.com/oauth/'
         scope='openid email profile'
         state='random_state_value'
         params={
@@ -40,7 +40,7 @@ class CallBackHandlerView(APIView):
         
         if auth_code and state:
             token_url = 'https://oauth2.googleapis.com/token'
-            redirect_uri = 'http://gauth-blockverse.com:8000/oauth/'
+            redirect_uri = 'http://ec2-3-109-124-174.ap-south-1.compute.amazonaws.com/oauth/'
 
             params = {
                 'client_id': settings.GOOGLE_OAUTH2_CLIENT_ID,
