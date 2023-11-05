@@ -71,15 +71,11 @@ class CallBackHandlerView(APIView):
 
 class RegisterView(APIView):
     def get(self,request):
-        #check if user is authenticated through google_Oauth
-        token=request.COOKIES.get('jwt_token')
-        if not token:
-            return HttpResponseRedirect('/')
-        try:
-
+        if request.COOKIES.get('jwt_token'):
+            token=request.COOKIES.get('jwt_token')
             data=jwt.decode(token,settings.SECRET_KEY,algorithms=['HS256'])
-        except:
-            return HttpResponseRedirect('/')
+        else:
+            return Response({'message':'user not authenticated'})
         if LeaderModle.objects.filter(email=data['email']).exists():
             if LeaderModle.objects.get(email=data['email']).is_paid:
                 return HttpResponseRedirect('/dashboard/')
@@ -87,7 +83,6 @@ class RegisterView(APIView):
                 return HttpResponseRedirect('/dashboard/')
             else:
                 return render(request,'oauth/register.html',context={'data':data})
-            
         else:
             LeaderModle.objects.create(
                 email=data['email'],
@@ -99,14 +94,11 @@ class RegisterView(APIView):
             
             return render(request,'oauth/register.html',context={'data':data})
     def post(self,request):
-        token=request.COOKIES.get('jwt_token')
-        if not token:
-            return HttpResponseRedirect('/')
-        try:
-
+        if request.COOKIES.get('jwt_token'):
+            token=request.COOKIES.get('jwt_token')
             data=jwt.decode(token,settings.SECRET_KEY,algorithms=['HS256'])
-        except:
-            return HttpResponseRedirect('/')
+        else:
+            return Response({'message':'user not authenticated'})
         team_data=request.data
         TeamModle.objects.create(
             team_name=team_data['team_name'],
@@ -120,14 +112,14 @@ class RegisterView(APIView):
 
 class DashBoardView(APIView):
     def get(self,request):
-        token=request.COOKIES.get('jwt_token')
-        if not token:
-            return HttpResponseRedirect('/')
-        try:
-
+        if request.COOKIES.get('jwt_token'):
+            token=request.COOKIES.get('jwt_token')
             data=jwt.decode(token,settings.SECRET_KEY,algorithms=['HS256'])
-        except:
-            return HttpResponseRedirect('/')
+        else:
+            return Response({'message':'user not authenticated'})
+        if TeamModle.objects.filter(Leader=LeaderModle.objects.get(email=data['email'])).exists()==False:
+            return HttpResponseRedirect('/register/')
+
         if LeaderModle.objects.filter(email=data['email']).exists():
             Leader=LeaderModle.objects.get(email=data['email'])
             teams=TeamModle.objects.filter(Leader=Leader)
@@ -138,6 +130,16 @@ class DashBoardView(APIView):
         
 class PaymentView(APIView):
     def get(self,request):
+        
+        if request.COOKIES.get('jwt_token'):
+            token=request.COOKIES.get('jwt_token')
+            data=jwt.decode(token,settings.SECRET_KEY,algorithms=['HS256'])
+        else:
+            return Response({'message':'user not authenticated'})
+        if TeamModle.objects.filter(Leader=LeaderModle.objects.get(email=data['email'])).exists()==False:
+            return HttpResponseRedirect('/register/')
+        if LeaderModle.objects.get(email=data['email']).is_paid:
+            return HttpResponseRedirect('/dashboard/')
         key=settings.RAZORPAY_API_KEY
         secret=settings.RAZORPAY_API_SECRET
         razorpay_client=razorpay.Client(auth=(key,secret))
@@ -164,7 +166,15 @@ class PaymentCallBackView(APIView):
         key=settings.RAZORPAY_API_KEY
         secret=settings.RAZORPAY_API_SECRET
         razorpay_client=razorpay.Client(auth=(key,secret))
-        global data
+        if request.COOKIES.get('jwt_token'):
+            token=request.COOKIES.get('jwt_token')
+            data=jwt.decode(token,settings.SECRET_KEY,algorithms=['HS256'])
+        else:
+            return Response({'message':'user not authenticated'})
+        if TeamModle.objects.filter(Leader=LeaderModle.objects.get(email=data['email'])).exists()==False:
+            return HttpResponseRedirect('/register/')
+        if LeaderModle.objects.get(email=data['email']).is_paid:
+            return HttpResponseRedirect('/dashboard/')
         try:
            
             # get the required parameters from post request.
@@ -203,9 +213,9 @@ class PaymentCallBackView(APIView):
             # if we don't find the required parameters in POST data
             return Response({'message':'payment failed'})
 
+
 class LogoutView(APIView):
     def get(self,request):
         response=HttpResponseRedirect('/')
         response.delete_cookie('jwt_token')
         return response
-
