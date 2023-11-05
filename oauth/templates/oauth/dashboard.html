@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dashboard</title>
+</head>
+<body>
+    <center>
+    <h1>Welcome, {{ Leader.full_name }}! <img src="{{ Leader.picture_url }}" alt="Leader's profile photo"></h1>
+
+    <h2>Your Team:</h2>
+    
+        {% for team in teams %}
+            <u><h3>{{ team.team_name }}</h3></u>
+        {% endfor %}
+    
+
+    <h2>Team Members:</h2>
+    
+        {% for team in teams %}
+            
+                Team: {{ team.team_name }}<br><br><br>
+                
+                    Leader: {{ team.Leader.full_name }}<br><br>
+                    Team Member 1: {{ team.team_member1_name }}<br><br>
+                    Team Member 2: {{ team.team_member2_name }}<br><br>
+                
+            
+        {% endfor %}
+    </ul>
+
+    {% if Leader.is_paid %}
+        <h2>Congratulations! You've already paid the registration amount.</h2>
+    {% else %}
+        <h2>You haven't paid the registration amount yet, Kindly pay inorder to complete registration</h2>
+        <form method="get" action="/payment/">
+            <button type="submit">Make Payment</button>
+        </form>
+    {% endif %}
+</center>
+</body>
+</html>
+    
+   

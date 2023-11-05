@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register Teams</title>
+</head>
+<body>
+    <center>
+    <h1>Leader Info:</h1>
+    
+        <img src="{{ data.picture }}" alt="Leador's Photo">
+    <br><br>
+    <strong>Team Leader's Name: {{ data.name }}
+    <br><br>
+    Team Leader's Email: {{ data.email }}
+    <br><br></strong>
+
+
+    <h2>Team Registration: </h2>
+    <form method="post" autocomplete="off">
+        Team Name: <input type="text" name="team_name" placeholder="Team Name" required>
+        <br><br>
+        1st Member Name: <input type="text" name="member1"required>
+        <br><br>
+        1st Member Email: <input type="email" name="email1"required>
+        <br><br>
+
+        2nd Member Name: <input type="text" name="member2"required>
+        <br><br>
+        2nd Member Email: <input type="email" name="email2" required>
+        <br><br>
+        <input type="submit" value="Create Team">
+    </form>
+    </center>
+
+
+</body>
+</html>
