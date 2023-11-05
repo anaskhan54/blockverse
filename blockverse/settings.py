@@ -133,3 +133,10 @@ RAZORPAY_API_KEY = 'rzp_test_QTLfZtTtbzhwWG'
 RAZORPAY_API_SECRET = '81qHqM4IQHkOuHteXUiLvynf'
 
 JWT_SECRRET='92f4719d8d1429c3f3dac8e765a4502cc8c1113c8e99c4f1d5f1c39c6a99f9ab'
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'professor00333@gmail.com'
+EMAIL_HOST_PASSWORD = 'mfvckflpffdsqrqa'

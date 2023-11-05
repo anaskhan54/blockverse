@@ -6,6 +6,7 @@ import urllib
 from django.http.response import HttpResponseRedirect
 import requests,json,razorpay,jwt
 from .models import LeaderModle,TeamModle
+from django.core.mail import send_mail
 # Create your views here.
 data={'email':''}
 
@@ -108,6 +109,11 @@ class RegisterView(APIView):
             team_member1_email=team_data['email1'],
             team_member2_email=team_data['email2'],
         )
+        subject='Registration Successful'
+        message=f'Hi {LeaderModle.objects.get(email=data["email"]).full_name},\n\nYou are one step behind the Registration.\n\nKindly Proceed with the payment of Amount INR 20 to proceed with the Registration\n \n\nRegards,\nTeam Blockverse\n\n'
+        email_from='professor00333@gmail.com'
+        email_to=[LeaderModle.objects.get(email=data['email']).email]
+        send_mail(subject,message,email_from,email_to)
         return HttpResponseRedirect('/dashboard/')
 
 class DashBoardView(APIView):
@@ -201,6 +207,11 @@ class PaymentCallBackView(APIView):
                     user=LeaderModle.objects.get(email=data['email'])
                     user.is_paid=True
                     user.save()
+                    subject='Payment Successful'
+                    message=f'Hi {user.full_name},\n\nYour payment of Rs. 20 has been received successfully.\n \n\nRegards,\nTeam Blockverse\n\n'
+                    email_from='professor00333@gmail.com'
+                    email_to=[user.email]
+                    send_mail(subject,message,email_from,email_to)
                     return HttpResponseRedirect('/dashboard/')
                 except:
  
