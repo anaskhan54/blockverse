@@ -40,7 +40,7 @@ class CallBackHandlerView(APIView):
         
         if auth_code and state:
             token_url = 'https://oauth2.googleapis.com/token'
-            redirect_uri = 'http://ec2-3-109-124-174.ap-south-1.compute.amazonaws.com/oauth/'
+            redirect_uri = 'http://ec2-3-109-124-174.ap-south-1.compute.amazonaws.com/oauth'
 
             params = {
                 'client_id': settings.GOOGLE_OAUTH2_CLIENT_ID,
