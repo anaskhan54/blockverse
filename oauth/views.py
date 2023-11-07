@@ -109,6 +109,8 @@ class RegisterView(APIView):
         team_data=request.data
         if team_data['email1']==team_data['email2']:
             return Response({"message":"team members cannot have same email"})
+        if team_data['email1']==data['email'] or team_data['email2']==data['email']:
+            return Response({"message":"team members can not have email of leader"})
         try:
 
             TeamModle.objects.create(
