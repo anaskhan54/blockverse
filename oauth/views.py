@@ -7,6 +7,8 @@ from django.http.response import HttpResponseRedirect
 import requests,json,razorpay,jwt
 from .models import LeaderModle,TeamModle
 from django.core.mail import send_mail
+import re
+
 # Create your views here.
 data={'email':''}
 
@@ -61,7 +63,11 @@ class CallBackHandlerView(APIView):
                 response = requests.get(user_info_url, headers=headers)
                  
                 data= json.loads(response.text)
-
+                pattern = r"^[a-zA-Z0-9_.+-]+@" + re.escape('akgec.ac.in') + "$"
+                if re.match(pattern,data['email']):
+                    pass
+                else:
+                    return Response({"message":"can only use sollege email id"})
                 jwt_data=data
                 token=jwt.encode(jwt_data,settings.SECRET_KEY,algorithm='HS256')
                 response=HttpResponseRedirect('/register/')
