@@ -11,14 +11,14 @@ import re
 
 # Create your views here.
 data={'email':''}
-
+callme='http://ec2-3-109-124-174.ap-south-1.compute.amazonaws.com/oauth/'
 class LandingPageView(APIView):
     def get(self,request):
         return render(request,'oauth/landing_page.html')
 class GoogleOauthView(APIView):
     def get(self,request):
         auth_url='https://accounts.google.com/o/oauth2/v2/auth'
-        redirect_uri = 'http://ec2-3-109-124-174.ap-south-1.compute.amazonaws.com/oauth/'
+        redirect_uri = callme
         scope='openid email profile'
         state='random_state_value'
         params={
@@ -42,7 +42,7 @@ class CallBackHandlerView(APIView):
         
         if auth_code and state:
             token_url = 'https://oauth2.googleapis.com/token'
-            redirect_uri = 'http://ec2-3-109-124-174.ap-south-1.compute.amazonaws.com/oauth/'
+            redirect_uri = callme
 
             params = {
                 'client_id': settings.GOOGLE_OAUTH2_CLIENT_ID,
@@ -110,7 +110,7 @@ class RegisterView(APIView):
         if team_data['email1']==team_data['email2']:
             return Response({"message":"team members cannot have same email"})
         if team_data['email1']==data['email'] or team_data['email2']==data['email']:
-            return Response({"message":"team members can not have email of leader"})
+            return Response({"message":"team members can not have email of leader"}) 
         try:
 
             TeamModle.objects.create(
@@ -128,7 +128,7 @@ class RegisterView(APIView):
         email_from='professor00333@gmail.com'
         email_to=[LeaderModle.objects.get(email=data['email']).email]
         send_mail(subject,message,email_from,email_to)
-        return HttpResponseRedirect('/dashboard/')
+        return Response({"message":"Team registered successfully"})
 
 class DashBoardView(APIView):
     def get(self,request):
@@ -137,10 +137,9 @@ class DashBoardView(APIView):
             data=jwt.decode(token,settings.SECRET_KEY,algorithms=['HS256'])
         else:
             return Response({'message':'user not authenticated'})
-        if LeaderModle.objects.filter(email=data['email']).exists()==False:
-            return HttpResponseRedirect('/register/')
+        
         if TeamModle.objects.filter(Leader=LeaderModle.objects.get(email=data['email'])).exists()==False:
-            return HttpResponseRedirect('/register/')
+            return Response({"message":"you have not registered your team"})
 
         if LeaderModle.objects.filter(email=data['email']).exists():
             Leader=LeaderModle.objects.get(email=data['email'])
@@ -159,9 +158,9 @@ class PaymentView(APIView):
         else:
             return Response({'message':'user not authenticated'})
         if TeamModle.objects.filter(Leader=LeaderModle.objects.get(email=data['email'])).exists()==False:
-            return HttpResponseRedirect('/register/')
+            return Response({"message":"you have not registered your team"})
         if LeaderModle.objects.get(email=data['email']).is_paid:
-            return HttpResponseRedirect('/dashboard/')
+            return Response({"message":"you have already paid"})
         key=settings.RAZORPAY_API_KEY
         secret=settings.RAZORPAY_API_SECRET
         razorpay_client=razorpay.Client(auth=(key,secret))
@@ -194,9 +193,9 @@ class PaymentCallBackView(APIView):
         else:
             return Response({'message':'user not authenticated'})
         if TeamModle.objects.filter(Leader=LeaderModle.objects.get(email=data['email'])).exists()==False:
-            return HttpResponseRedirect('/register/')
+            return Response({"message":"You havent registered your team"})
         if LeaderModle.objects.get(email=data['email']).is_paid:
-            return HttpResponseRedirect('/dashboard/')
+            return Response({"message":"You have already paid!"})
         try:
            
             # get the required parameters from post request.
@@ -226,7 +225,7 @@ class PaymentCallBackView(APIView):
                     email_from='professor00333@gmail.com'
                     email_to=[user.email]
                     send_mail(subject,message,email_from,email_to)
-                    return HttpResponseRedirect('/dashboard/')
+                    return Response({"messsage":"success"})
                 except:
  
                     # if there is an error while capturing payment.
