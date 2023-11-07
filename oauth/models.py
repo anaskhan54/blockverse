@@ -15,5 +15,5 @@ class TeamModle(models.Model):
     Leader=models.ForeignKey(LeaderModle,on_delete=models.CASCADE)
     team_member1_name=models.CharField(max_length=100)
     team_member2_name=models.CharField(max_length=100)
-    team_member1_email=models.EmailField(max_length=100)
-    team_member2_email=models.EmailField(max_length=100)
+    team_member1_email=models.EmailField(max_length=100,unique=True)
+    team_member2_email=models.EmailField(max_length=100,unique=True)

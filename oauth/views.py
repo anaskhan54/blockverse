@@ -101,14 +101,17 @@ class RegisterView(APIView):
         else:
             return Response({'message':'user not authenticated'})
         team_data=request.data
-        TeamModle.objects.create(
-            team_name=team_data['team_name'],
-            Leader=LeaderModle.objects.get(email=data['email']),
-            team_member1_name=team_data['member1'],
-            team_member2_name=team_data['member2'],
-            team_member1_email=team_data['email1'],
-            team_member2_email=team_data['email2'],
-        )
+        try:
+            TeamModle.objects.create(
+                team_name=team_data['team_name'],
+                Leader=LeaderModle.objects.get(email=data['email']),
+                team_member1_name=team_data['member1'],
+                team_member2_name=team_data['member2'],
+                team_member1_email=team_data['email1'],
+                team_member2_email=team_data['email2'],
+            )
+        except:
+            return Response({"message":"same member can not be in 2 teams at the same time"})
         subject='Registration Successful'
         message=f'Hi {LeaderModle.objects.get(email=data["email"]).full_name},\n\nYou are one step behind the Registration.\n\nKindly Proceed with the payment of Amount INR 20 to proceed with the Registration\n \n\nRegards,\nTeam Blockverse\n\n'
         email_from='professor00333@gmail.com'
