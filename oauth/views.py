@@ -107,7 +107,10 @@ class RegisterView(APIView):
         else:
             return Response({'message':'user not authenticated'})
         team_data=request.data
+        if team_data['email1']==team_data['email2']:
+            return Response({"message":"team members cannot have same email"})
         try:
+
             TeamModle.objects.create(
                 team_name=team_data['team_name'],
                 Leader=LeaderModle.objects.get(email=data['email']),
